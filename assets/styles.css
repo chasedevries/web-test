@@ -1,0 +1,119 @@
+:root {
+  --tan: #e1b382;
+  --shadow: #c89666;
+  --blue: #2d545e;
+  --night: #12343b;
+  --black: #000000;
+  --white: #ffffff;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--shadow);
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: var(--night);
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: var(--blue);
+  color: var(--white);
+}
+
+.active {
+  background-color: var(--tan);
+}
+
+.floating-box {
+  color: var(--tan);
+  background-color: var(--blue);
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.content-frame {
+  background-color: var(--night);
+  width:auto;
+  height:auto;
+}
+
+.floating-button {
+  color: var(--night);
+  background-color: var(--shadow);
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  margin-top: 5px;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.floating-button:hover {
+  color: var(--blue);
+  background-color: var(--tan);
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  margin-top: 5px;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.heading {
+  color: var(--tan);
+  font-size: xx-large;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.paragraph {
+  color: var(--shadow);
+  font-family: monospace;
+}
+
+.container {
+  height:100%;
+  width:100%;
+  font-size:0;
+}
+
+.hstack {
+  float: left;
+  clear: none;
+}
+
+.term {
+  color: var(--tan);
+  font-weight: bold;
+  font-family: monospace;
+  font-size: large;
+  padding-right: 5px;
+  text-align: right;
+}
+
+.definition {
+  color: var(--shadow);
+  font-family: monospace;
+  font-size: large;
+  text-align: left;
+}
+.left, .middle, .right {
+  display:inline-block;
+  display:inline;
+  zoom:2;
+  vertical-align:top;
+  font-size:13px;
+}
