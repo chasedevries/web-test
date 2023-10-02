@@ -5,6 +5,34 @@
   --night: #12343b;
   --black: #000000;
   --white: #ffffff;
+
+  --md: 5px;
+}
+
+h1, h2, h3, h4 {
+  font-family: monospace;
+  color: var(--tan);
+}
+
+section h1 {
+  padding-left: 10px;
+}
+
+section h2 {
+  padding-left: 20px;
+  padding-top: 10px;
+}
+
+section h3 {
+  padding-left: 30px;
+  padding-top: 5px;
+}
+
+section p {
+  color: var(--shadow);
+  padding-left: 40px;
+  padding-right: 40px;
+  max-width: 80%;
 }
 
 ul {
@@ -12,7 +40,11 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: var(--shadow);
+}
+
+.menu-bar {
+  background-color: var(--blue);
+  border-radius: var(--md);
 }
 
 li {
@@ -21,7 +53,7 @@ li {
 
 li a {
   display: block;
-  color: var(--night);
+  color: var(--tan);
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -29,19 +61,26 @@ li a {
 
 /* Change the link color to #111 (black) on hover */
 li a:hover {
-  background-color: var(--blue);
-  color: var(--white);
+  background-color: var(--tan);
+  color: var(--night);
 }
 
 .active {
-  background-color: var(--tan);
+  background-color: var(--shadow);
+  color: var(--night);
 }
 
 .floating-box {
   color: var(--tan);
   background-color: var(--blue);
-  border-radius: 15px;
+  border-radius: var(--md);
   padding: 15px;
+  font-family: monospace;
+  width: max-content;
+}
+
+.hstack {
+  float: left;
 }
 
 .content-frame {
@@ -54,22 +93,15 @@ li a:hover {
   color: var(--night);
   background-color: var(--shadow);
   border: none;
-  border-radius: 5px;
-  padding: 5px;
-  margin-top: 5px;
+  border-radius: var(--md);
+  padding: 10px;
+  margin-top: 10px;
   font-weight: bold;
   font-family: monospace;
 }
 
 .floating-button:hover {
-  color: var(--blue);
   background-color: var(--tan);
-  border: none;
-  border-radius: 5px;
-  padding: 5px;
-  margin-top: 5px;
-  font-weight: bold;
-  font-family: monospace;
 }
 
 .heading {
@@ -83,6 +115,8 @@ li a:hover {
   color: var(--shadow);
   font-family: monospace;
 }
+
+.containerdivNewLine { clear: both;} 
 
 .container {
   height:100%;
@@ -116,4 +150,20 @@ li a:hover {
   zoom:2;
   vertical-align:top;
   font-size:13px;
+}
+
+.essay-page {
+  font-family: monospace;
+}
+
+.footer {
+  color: var(--shadow);
+  font-family: monospace;
+  padding-top: 40px;
+  text-align: center;
+}
+
+.fullscreen-image {
+  max-width: 100%;
+  max-height: 100%;
 }

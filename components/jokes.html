@@ -9,7 +9,7 @@
       <link rel="stylesheet" href="/assets/styles.css">
       <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
     </head>
-    <ul>
+    <ul class="menu-bar">
       <li><a href="/">Home</a></li>
       <li><a href="/jokes" class="active">Jokes</a></li>
       <li><a href="/contact">Contact</a></li>
@@ -17,11 +17,13 @@
     </ul>
     <div>
       <h1 class="heading">Jokes by Chase</h1>
-      <p class="paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat</p>
+      <p class="paragraph">Click the button below to randomly generate a joke.</p>
     </div>
-    <div id="joke-box"></div>
+    <div class="floating-box" id="joke-box">
+      <p>A horse walks into a bar, the bartender asks "Why the long face?"</p>
+    </div>
     <div>
-      <button hx-put="/generate" hx-target="#joke-box" class="floating-button">Tell me a joke</button>
+      <button hx-put="/generate" hx-target="#joke-box" hx-swap="outerHTML" class="floating-button">Tell me a joke</button>
     </div>
   </body>
 </html>

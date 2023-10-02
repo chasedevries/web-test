@@ -1,5 +1,4 @@
-module github.com/freshman-tech/news-demo-starter-files
+module htmx-demo
 
-go 1.15
-
+go 1.21.1
 require github.com/joho/godotenv v1.5.1
