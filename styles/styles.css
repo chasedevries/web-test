@@ -9,8 +9,11 @@
   --md: 5px;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, p, ul, li, a {
   font-family: monospace;
+}
+
+h1, h2, h3, h4, a {
   color: var(--tan);
 }
 
@@ -53,7 +56,6 @@ li {
 
 li a {
   display: block;
-  color: var(--tan);
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -72,11 +74,16 @@ li a:hover {
 
 .floating-box {
   color: var(--tan);
+  max-width: calc(100% - 30px);
+  min-width: calc(200px);
+  min-height: 100%;
+
   background-color: var(--blue);
   border-radius: var(--md);
-  padding: 15px;
+
+  margin: 5px;
+  padding: 5px;
   font-family: monospace;
-  width: max-content;
 }
 
 .hstack {
@@ -87,6 +94,10 @@ li a:hover {
   background-color: var(--night);
   width:auto;
   height:auto;
+}
+
+.float-right {
+  float: right;
 }
 
 .floating-button {

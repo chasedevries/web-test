@@ -1,54 +1,14 @@
-package main // This code belongs to the 'main' package
+package main
 
 import (
-	"html/template" // injection safe html generation
-	jokeUtil "htmx-demo/jokes"
+	requestHandler "htmx-demo/router"
 	"log"      // self explanatory
 	"net/http" // This provides HTTP client and server implementations for the app
 	"os"       // Access operating system functionality
 
+	"github.com/gorilla/mux"   // router for the site
 	"github.com/joho/godotenv" // read from a .env file for this application
 )
-
-func index(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/index.html"))
-	tpl.Execute(w, nil)
-}
-
-func jokes(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/jokes.html"))
-	tpl.Execute(w, nil)
-}
-
-func contact(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/contact.html"))
-	tpl.Execute(w, nil)
-}
-
-func about(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/about.html"))
-	tpl.Execute(w, nil)
-}
-
-func generate(w http.ResponseWriter, r *http.Request) {
-	p := jokeUtil.GetRandomJoke()
-	tpl, _ := template.ParseFiles("components/joke.html")
-	tpl.Execute(w, p)
-}
-
-func faviconHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "assets/favicon-32x32.png")
-}
-
-func handleRequests(mux *http.ServeMux, port string) {
-	mux.HandleFunc("/", index)
-	mux.HandleFunc("/jokes", jokes)
-	mux.HandleFunc("/contact", contact)
-	mux.HandleFunc("/about", about)
-	mux.HandleFunc("/generate", generate)
-	mux.HandleFunc("/favicon.ico", faviconHandler)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
-}
 
 func main() {
 	err := godotenv.Load()
@@ -61,8 +21,8 @@ func main() {
 		port = "3000"
 	}
 
-	fs := http.FileServer(http.Dir("assets"))
-	mux := http.NewServeMux()
-	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
-	handleRequests(mux, port)
+	router := mux.NewRouter()
+	router.PathPrefix("/styles/").Handler(http.StripPrefix("/styles/", http.FileServer(http.Dir("/Users/chasedevries/Desktop/DesktopStuff/HtmxHelloWorld/HtmxDemo/styles/"))))
+	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("/Users/chasedevries/Desktop/DesktopStuff/HtmxHelloWorld/HtmxDemo/assets/"))))
+	requestHandler.HandleRequests(router, port)
 }

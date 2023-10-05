@@ -1,4 +1,4 @@
-package jokeResources
+package jokeFactory
 
 import (
 	"math/rand"
