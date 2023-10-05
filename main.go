@@ -2,11 +2,12 @@ package main
 
 import (
 	requestHandler "htmx-demo/router"
-	"log"      // self explanatory
-	"net/http" // This provides HTTP client and server implementations for the app
-	"os"       // Access operating system functionality
+	"log" // self explanatory
+	"net/http"
 
-	"github.com/gorilla/mux"   // router for the site
+	// This provides HTTP client and server implementations for the app
+	"os" // Access operating system functionality
+
 	"github.com/joho/godotenv" // read from a .env file for this application
 )
 
@@ -21,8 +22,6 @@ func main() {
 		port = "3000"
 	}
 
-	router := mux.NewRouter()
-	router.PathPrefix("/styles/").Handler(http.StripPrefix("/styles/", http.FileServer(http.Dir("/Users/chasedevries/Desktop/DesktopStuff/HtmxHelloWorld/HtmxDemo/styles/"))))
-	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("/Users/chasedevries/Desktop/DesktopStuff/HtmxHelloWorld/HtmxDemo/assets/"))))
+	router := http.NewServeMux()
 	requestHandler.HandleRequests(router, port)
 }
