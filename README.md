@@ -1,4 +1,4 @@
-Hosting: Google cloud run (https://console.cloud.google.com/run/detail/us-east1/htmxdemo)
+Hosting: Google cloud run
 
 Backend: Go (https://freshman.tech/web-development-with-go/) (https://www.youtube.com/watch?v=W5b64DXeP0o&list=PLzUGFf4GhXBL4GHXVcMMvzgtO8-WEJIoY)
 
@@ -14,8 +14,8 @@ TODO:
 
 
 Docker:
-  build: 'docker build --tag htmx-demo .' (https://docs.docker.com/language/golang/build-images/)
-  run: 'docker run publish 6969:6969 htmx-demo' (https://docs.docker.com/language/golang/run-containers/)
+  build: `docker build --tag htmx-demo .` (https://docs.docker.com/language/golang/build-images/)
+  run: `docker run --publish 6969:6969 htmx-demo` (https://docs.docker.com/language/golang/run-containers/)
 
 SQL db:
   Instance ID: 'htmx-demo-db'
