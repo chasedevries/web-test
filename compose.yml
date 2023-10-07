@@ -1,0 +1,25 @@
+services:
+  app:
+    image: htmx-demo
+    ports: 
+      - 127.0.0.1:6969:6969
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: demo-db
+
+  mysql:
+    image: mysql:8.0
+    volumes: 
+      - htmx-demo-db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: demo-db
+
+
+volumes:
+  htmx-demo-db:
