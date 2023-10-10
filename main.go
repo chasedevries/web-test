@@ -23,7 +23,7 @@ func main() {
 	}
 
 	const (
-		DB_HOST = "tcp(127.0.0.1:3306)"
+		DB_HOST = "tcp(mysql:3307)"
 		DB_NAME = "demo-db"
 		DB_USER = "root"
 		DB_PASS = "secret"
@@ -37,12 +37,14 @@ func main() {
 
 		db, err := sql.Open("mysql", dsn)
 		if err != nil {
+			log.Println("Open:" + dsn)
 			log.Println("Error: " + err.Error())
 			return
 		}
 
 		err = db.Ping()
 		if err != nil {
+			log.Println("Ping")
 			log.Println("Error: " + err.Error())
 			time.Sleep(2 * time.Second)
 			continue

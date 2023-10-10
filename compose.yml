@@ -11,15 +11,22 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: secret
       MYSQL_DB: demo-db
+    expose:
+      - 6969
 
   mysql:
     image: mysql:8.0
     volumes: 
-      - htmx-demo-db:/var/lib/mysql
+      - mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: demo-db
+      MYSQL_TCP_PORT: 3307
+    ports:
+    - 127.0.0.1:3307:3307
+    expose:
+      - 3307
 
 
 volumes:
-  htmx-demo-db:
+  mysql:
