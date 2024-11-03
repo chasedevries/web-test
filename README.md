@@ -21,6 +21,7 @@ usage:
 How to launch this baddie:
   `docker build --tag htmx-demo .`
   `docker compose up`
+Local instance at `localhost:6969`
 
 SQL db:
   Instance ID: 'htmx-demo-db'

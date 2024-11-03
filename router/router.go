@@ -3,6 +3,7 @@ package requestHandler
 import (
 	"html/template" // injection safe html generation
 	jokeFactory "htmx-demo/jokes"
+	mySqlHandler "htmx-demo/mysql"
 	"log"
 	"net/http"
 )
@@ -33,6 +34,17 @@ func generate(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, p)
 }
 
+func comment(w http.ResponseWriter, r *http.Request) {
+	comment := mySqlHandler.GetAComment()
+	tpl, _ := template.ParseFiles("components/comment.html")
+	tpl.Execute(w, comment)
+}
+
+func photos(w http.ResponseWriter, r *http.Request) {
+	var tpl = template.Must(template.ParseFiles("components/photos.html"))
+	tpl.Execute(w, nil)
+}
+
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/favicon-32x32.png")
 }
@@ -46,6 +58,8 @@ func HandleRequests(router *http.ServeMux, port string) {
 	router.HandleFunc("/contact", contact)
 	router.HandleFunc("/about", about)
 	router.HandleFunc("/generate", generate)
+	router.HandleFunc("/comment", comment)
+	router.HandleFunc("/photos", photos)
 	router.HandleFunc("/favicon.ico", faviconHandler)
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	router.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
