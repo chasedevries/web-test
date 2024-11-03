@@ -34,14 +34,12 @@
         }
         let imageCount = 0;
         async function recursiveRender(index) {
-          if (index % 4 === 3) {
-            // console.log('rendering', index);
-            console.log('waiting');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
           console.log('rendering recursively', index);
           if (index < data.items.length) {
             if (data.items[index] && data.items[index].contentType == 'image/jpeg') {
+              const a = document.createElement("a");
+              a.href = `https://storage.googleapis.com/${data.items[index].bucket}/${data.items[index].name}`;
+              a.target = "_blank";
               const img = document.createElement('img');
               img.src = `https://storage.googleapis.com/${data.items[index].bucket}/${data.items[index].name}`;
               img.alt = data.items[index].name;
@@ -50,13 +48,13 @@
                 recursiveRender(index + 1);
               };
               const column = document.getElementById(`column${(imageCount % COLUMN_COUNT) + 1}`);
-              column.appendChild(img);
+              a.appendChild(img);
+              column.appendChild(a);
               imageCount++;
             } else {
               recursiveRender(index + 1);
             }
           }
-
         }
         recursiveRender(0);
       }
