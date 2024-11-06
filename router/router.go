@@ -45,6 +45,11 @@ func photos(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, nil)
 }
 
+func sam(w http.ResponseWriter, r *http.Request) {
+	var tpl = template.Must(template.ParseFiles("components/sam.html"))
+	tpl.Execute(w, nil)
+}
+
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/favicon-32x32.png")
 }
@@ -60,6 +65,7 @@ func HandleRequests(router *http.ServeMux, port string) {
 	router.HandleFunc("/generate", generate)
 	router.HandleFunc("/comment", comment)
 	router.HandleFunc("/photos", photos)
+	// router.HandleFunc("/sam", sam)
 	router.HandleFunc("/favicon.ico", faviconHandler)
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	router.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))

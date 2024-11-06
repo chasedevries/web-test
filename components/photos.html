@@ -36,13 +36,15 @@
         async function recursiveRender(index) {
           console.log('rendering recursively', index);
           if (index < data.items.length) {
-            if (data.items[index] && data.items[index].contentType == 'image/jpeg') {
+            if (data.items[index] && data.items[index].contentType == 'image/jpeg' && data.items[index].name.includes('-thumbs')) {
+              const thumbnail = data.items[index];
+              const fullSize = data.items.find(item => item.name === data.items[index].name.replace('-thumbs', ''));
               const a = document.createElement("a");
-              a.href = `https://storage.googleapis.com/${data.items[index].bucket}/${data.items[index].name}`;
+              a.href = `https://storage.googleapis.com/${fullSize.bucket}/${fullSize.name}`;
               a.target = "_blank";
               const img = document.createElement('img');
-              img.src = `https://storage.googleapis.com/${data.items[index].bucket}/${data.items[index].name}`;
-              img.alt = data.items[index].name;
+              img.src = `https://storage.googleapis.com/${thumbnail.bucket}/${thumbnail.name}`;
+              img.alt = thumbnail.name;
               img.onload = () => {
                 console.log('loaded', index);
                 recursiveRender(index + 1);
