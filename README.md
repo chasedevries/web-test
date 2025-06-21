@@ -21,8 +21,14 @@ usage:
 How to launch this baddie:
   `docker build --tag htmx-demo .`
   `docker compose up`
+Alternatively, just run `air` (lazy)
+
 Local instance at `localhost:6969`
 
 SQL db:
   Instance ID: 'htmx-demo-db'
   password: password
+
+
+templ: Templating
+`~/go/bin/templ generate`

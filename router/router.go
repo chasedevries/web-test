@@ -3,28 +3,29 @@ package requestHandler
 import (
 	"html/template" // injection safe html generation
 	jokeFactory "htmx-demo/jokes"
-	mySqlHandler "htmx-demo/mysql"
+	requestHandler "htmx-demo/requests"
 	"log"
 	"net/http"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/index.html"))
+	var tpl = template.Must(template.ParseFiles("views/index.html"))
 	tpl.Execute(w, nil)
 }
 
 func jokes(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/jokes.html"))
+	var tpl = template.Must(template.ParseFiles("views/jokes.html"))
+	tpl.Execute(w, nil)
+
+}
+
+func photos(w http.ResponseWriter, r *http.Request) {
+	var tpl = template.Must(template.ParseFiles("views/photos.html"))
 	tpl.Execute(w, nil)
 }
 
-func contact(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/contact.html"))
-	tpl.Execute(w, nil)
-}
-
-func about(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/about.html"))
+func budget(w http.ResponseWriter, r *http.Request) {
+	var tpl = template.Must(template.ParseFiles("views/budget.html"))
 	tpl.Execute(w, nil)
 }
 
@@ -34,20 +35,10 @@ func generate(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, p)
 }
 
-func comment(w http.ResponseWriter, r *http.Request) {
-	comment := mySqlHandler.GetAComment()
-	tpl, _ := template.ParseFiles("components/comment.html")
-	tpl.Execute(w, comment)
-}
-
-func photos(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/photos.html"))
-	tpl.Execute(w, nil)
-}
-
-func sam(w http.ResponseWriter, r *http.Request) {
-	var tpl = template.Must(template.ParseFiles("components/sam.html"))
-	tpl.Execute(w, nil)
+func navBar(w http.ResponseWriter, r *http.Request) {
+	n := requestHandler.GetNavbarForRequest(r)
+	var tpl = template.Must(template.ParseFiles("components/navbar.html"))
+	tpl.Execute(w, n)
 }
 
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,16 +49,25 @@ func faviconHandler(w http.ResponseWriter, r *http.Request) {
  * as it turns out, only capitalized identifiers are exported from a module.
 **/
 func HandleRequests(router *http.ServeMux, port string) {
-	router.HandleFunc("/", index)
-	router.HandleFunc("/jokes", jokes)
-	router.HandleFunc("/contact", contact)
-	router.HandleFunc("/about", about)
-	router.HandleFunc("/generate", generate)
-	router.HandleFunc("/comment", comment)
-	router.HandleFunc("/photos", photos)
-	// router.HandleFunc("/sam", sam)
 	router.HandleFunc("/favicon.ico", faviconHandler)
+	router.HandleFunc("/", index)
+	router.HandleFunc("/photos", photos)
+	router.HandleFunc("/jokes", jokes)
+	router.HandleFunc("/budget", budget)
+
+	router.HandleFunc("/generate", generate)
+	router.HandleFunc("/navbar", navBar)
+	router.HandleFunc("/budgetData", requestHandler.BudgetData)
+	router.HandleFunc("/auth", requestHandler.Auth)
+	// router.HandleFunc("/jokes", jokes)
+	// router.HandleFunc("/contact", contact)
+	// router.HandleFunc("/about", about)
+	// router.HandleFunc("/comment", comment)
+	// router.HandleFunc("/sam", sam)
+
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	router.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
+
+	log.Println("Server is running on http://localhost:" + port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
 }

@@ -1,0 +1,26 @@
+<ul class="menu-bar">
+  {{ if eq .Referer "/" }}
+  <li><a href="/" class="active">Home</a></li>
+  {{ else}}
+  <li><a href="/">Home</a></li>
+  {{ end }}
+
+  {{ if eq .Referer "/jokes" }}
+  <li><a href="/jokes" class="active">Jokes</a></li>
+  {{ else}}
+  <li><a href="/jokes">Jokes</a></li>
+  {{ end }}
+
+  {{ if eq .Referer "/photos" }}
+  <li><a href="/photos" class="active">Photos</a></li>
+  {{ else}}
+  <li><a href="/photos">Photos</a></li>
+  {{ end }}
+
+  {{ if eq .Referer "/budget" }}
+  <li><a href="/budget" class="active">Budget</a></li>
+  {{ else}}
+  <li><a href="/budget">Budget</a></li>
+  {{ end }}
+
+</ul>

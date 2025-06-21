@@ -14,14 +14,7 @@
       crossorigin="anonymous"></script>
   </head>
   <link rel="apple-touch-icon" href="/favicon.ico">
-  <ul class="menu-bar">
-    <li><a href="/" class="active">Home</a></li>
-    <li><a href="/jokes">Jokes</a></li>
-    <!-- <li><a href="/contact">Contact</a></li> -->
-    <li><a href="/photos">Photos</a></li>
-    <!-- <li style="float:right"><a href="/about">About</a></li> -->
-
-  </ul>
+  <div hx-trigger="load" hx-get="/navbar" class="menu-bar"></div>
   <div>
     <h1 class="heading">Welcome to Chase's website</h1>
     <p class="paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut

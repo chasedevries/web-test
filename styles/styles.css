@@ -58,17 +58,21 @@ ul {
 .menu-bar {
   background-color: var(--blue);
   border-radius: var(--md);
+  min-height: 3rem;
 }
 
 li {
   float: left;
+  min-height: 3rem;
 }
 
 li a {
-  display: block;
+  display: flex;
   text-align: center;
-  padding: 14px 16px;
+  align-items: center;
   text-decoration: none;
+  padding: 0px 20px;
+  min-height: 3rem;
 }
 
 /* Change the link color to #111 (black) on hover */
