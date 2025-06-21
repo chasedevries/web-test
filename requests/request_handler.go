@@ -91,6 +91,17 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 	BudgetData(w, r)
 }
 
+func Logout(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:   "SESSION",
+		Value:  "",
+		MaxAge: -1, // This will delete the cookie
+	}
+	http.SetCookie(w, &cookie)
+	log.Println("Session cookie cleared")
+	http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
+}
+
 func TransactionQuery(w http.ResponseWriter, r *http.Request) {
 	sessionCookie, err := getCookieFromRequest(r, "SESSION")
 

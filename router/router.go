@@ -59,6 +59,7 @@ func HandleRequests(router *http.ServeMux, port string) {
 	router.HandleFunc("/navbar", navBar)
 	router.HandleFunc("/budgetData", requestHandler.BudgetData)
 	router.HandleFunc("/auth", requestHandler.Auth)
+	router.HandleFunc("/logout", requestHandler.Logout)
 	// router.HandleFunc("/jokes", jokes)
 	// router.HandleFunc("/contact", contact)
 	// router.HandleFunc("/about", about)
