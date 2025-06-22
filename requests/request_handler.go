@@ -47,9 +47,11 @@ func getCookieFromRequest(r *http.Request, cookieName string) (*http.Cookie, err
 // TODO: dynamically trim the host part of the referer URL
 func GetNavbarForRequest(r *http.Request) Navbar {
 	Referer := r.Referer()
+	Host := r.Host
 
+	path := strings.Split(Referer, Host)
 	return Navbar{
-		Referer: strings.TrimPrefix(Referer, "http://localhost:6969"),
+		Referer: path[len(path)-1],
 	}
 }
 
