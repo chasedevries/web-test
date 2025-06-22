@@ -3,9 +3,9 @@
   <ul>
     {{ range .}}
     <li>
-      <div>
-        <p class="paragraph">Amount: ${{.TransactionAmount}}</p>
-        <p class="paragraph">Date: {{.TransactionDate}}</p>
+      <div class="floating-box">
+        <p>Amount: ${{.TransactionAmount}}</p>
+        <p>Date: {{.TransactionDate}}</p>
       </div>
     </li>
     {{ end}}

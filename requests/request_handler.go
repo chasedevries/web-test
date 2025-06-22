@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/supabase-community/gotrue-go/types"
@@ -20,7 +21,7 @@ type Error struct {
 	ErrorMessage string `json:"error_message"`
 }
 
-type Transaction struct {
+type TransactionQueryType struct {
 	Id                int    `json:"id"`
 	CreatedAt         string `json:"created_at"`
 	TransactionDate   string `json:"transaction_date"`
@@ -28,7 +29,12 @@ type Transaction struct {
 	UserId            string `json:"user_id"`
 }
 
-type TransactionResponse []Transaction
+type TransactionCreateType struct {
+	TransactionDate   string `json:"transaction_date"`
+	TransactionAmount int    `json:"transaction_amount"`
+}
+
+type TransactionResponse []TransactionQueryType
 
 // Creates a supabase client using the anonymous key
 // TODO: move this to env or config file
@@ -139,6 +145,41 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &cookie)
 	log.Println("Session cookie cleared")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func CreateTransaction(w http.ResponseWriter, r *http.Request) {
+	sessionCookie, err := getCookieFromRequest(r, "SESSION")
+	if err != nil {
+		log.Println("No SESSION cookie found:", err)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	client := getSupabaseClient()
+	client.UpdateAuthSession(types.Session{AccessToken: sessionCookie.Value})
+
+	amountString := r.FormValue("transactionAmount")
+	dateString := r.FormValue("transactionDate")
+
+	log.Println("form values:", r.Form)
+	log.Println("Received transaction amount:", amountString)
+	log.Println("Received transaction date:", dateString)
+
+	transactionAmount, err := strconv.Atoi(amountString)
+	transaction := TransactionCreateType{
+		TransactionDate:   dateString,
+		TransactionAmount: transactionAmount,
+	}
+
+	response, _, err := client.From("transactions").Insert(transaction, false, "", "", "").Execute()
+	if err != nil {
+		log.Println("Error inserting transaction:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Transaction created successfully:", response)
+	http.Redirect(w, r, "/budget", http.StatusSeeOther)
 }
 
 func TransactionQuery(w http.ResponseWriter, r *http.Request) {
