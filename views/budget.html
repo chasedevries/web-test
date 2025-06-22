@@ -19,18 +19,20 @@
     <h1 class="heading">Welcome to Chase's Budget</h1>
     <div hx-trigger="load" hx-get="/budgetData"></div>
   </div>
-
-  <form hx-put="/create-transaction" hx-target="body" hx-swap="innerHTML">
-    <div class="inputGroup">
-      <label for="transactionAmount">Transaction Amount:</label>
-      <input type="number" name="transactionAmount" placeholder="Enter transaction amount" required>
-    </div>
-    <div class="inputGroup">
-      <label for="transactionDate">Transaction Date:</label>
-      <input type="date" name="transactionDate" required>
-    </div>
-    <button class="floating-button" type="submit">Add Transaction</button>
-  </form>
+  <h3>Create a New Transaction</h3>
+  <div class="floating-box">
+    <form hx-put="/create-transaction" hx-target="body" hx-swap="innerHTML">
+      <div class="inputGroup">
+        <label for="transactionAmount">Transaction Amount:</label>
+        <input type="number" name="transactionAmount" placeholder="Enter transaction amount" required>
+      </div>
+      <div class="inputGroup">
+        <label for="transactionDate">Transaction Date:</label>
+        <input type="date" name="transactionDate" required>
+      </div>
+      <button class="floating-button" type="submit">Add Transaction</button>
+    </form>
+  </div>
 </body>
 
 </html>
