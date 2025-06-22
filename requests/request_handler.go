@@ -11,8 +11,9 @@ import (
 	"github.com/supabase-community/supabase-go"
 )
 
-type Navbar struct {
-	Referer string `json:"referer"`
+type NavbarProps struct {
+	Referer    string `json:"referer"`
+	IsLoggedIn bool   `json:"is_logged_in"`
 }
 
 type Error struct {
@@ -24,6 +25,7 @@ type Transaction struct {
 	CreatedAt         string `json:"created_at"`
 	TransactionDate   string `json:"transaction_date"`
 	TransactionAmount int    `json:"transaction_amount"`
+	UserId            string `json:"user_id"`
 }
 
 type TransactionResponse []Transaction
@@ -48,14 +50,26 @@ func getCookieFromRequest(r *http.Request, cookieName string) (*http.Cookie, err
 }
 
 // GetNavbarForRequest extracts the referer from the request and returns a Navbar struct.
-// TODO: dynamically trim the host part of the referer URL
-func GetNavbarForRequest(r *http.Request) Navbar {
+func GetNavbarForRequest(r *http.Request) NavbarProps {
 	Referer := r.Referer()
 	Host := r.Host
+	_, err := getCookieFromRequest(r, "SESSION")
+	IsLoggedIn := err == nil
 
 	path := strings.Split(Referer, Host)
-	return Navbar{
-		Referer: path[len(path)-1],
+	return NavbarProps{
+		IsLoggedIn: IsLoggedIn,
+		Referer:    path[len(path)-1],
+	}
+}
+
+func Navbar(w http.ResponseWriter, r *http.Request) {
+	n := GetNavbarForRequest(r)
+	tpl := template.Must(template.ParseFiles("components/navbar.html"))
+	err := tpl.Execute(w, n)
+	if err != nil {
+		log.Println("Error executing navbar template:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
 
@@ -65,9 +79,7 @@ func BudgetData(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("No SESSION cookie found:", err)
-		tpl := template.Must(template.ParseFiles("components/login.html"))
-		tpl.Execute(w, nil)
-		// tpl.Execute(w, Error{ErrorMessage: "Something went wrong. Please try again."})
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
@@ -75,20 +87,36 @@ func BudgetData(w http.ResponseWriter, r *http.Request) {
 	client.UpdateAuthSession(types.Session{AccessToken: cookie.Value})
 	data, _, err := client.From("transactions").Select("*", "exact", false).Execute()
 	log.Println("Transaction Data:", string(data))
+	transactions := TransactionResponse{}
+	err = json.Unmarshal(data, &transactions)
+	if err != nil {
+		log.Println("Error parsing supabase data:", err)
+	}
 
 	tpl := template.Must(template.ParseFiles("components/budget.html"))
-	tpl.Execute(w, nil)
+	tpl.Execute(w, transactions)
+}
+
+func LoginForm(w http.ResponseWriter, r *http.Request) {
+	tpl := template.Must(template.ParseFiles("components/login.html"))
+	err := tpl.Execute(w, nil)
+	if err != nil {
+		log.Println("Error executing login template:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 // Auth handles the authentication process and then redirects to login.
 // If successful, it sets a session cookie
 func Auth(w http.ResponseWriter, r *http.Request) {
 	client := getSupabaseClient()
-	username := r.FormValue("username")
+	email := r.FormValue("email")
 	password := r.FormValue("password")
-	session, err := client.SignInWithEmailPassword(username, password)
+	session, err := client.SignInWithEmailPassword(email, password)
 	if err != nil {
 		log.Println("Error signing in:", err)
+		LoginForm(w, r)
+		return
 	} else {
 		cookie := http.Cookie{
 			Name:  "SESSION",
@@ -99,7 +127,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		log.Println("Session cookie set:", cookie)
 	}
 
-	BudgetData(w, r)
+	http.Redirect(w, r, "/budget", http.StatusSeeOther)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
@@ -110,7 +138,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &cookie)
 	log.Println("Session cookie cleared")
-	http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func TransactionQuery(w http.ResponseWriter, r *http.Request) {

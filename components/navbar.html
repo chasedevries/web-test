@@ -17,14 +17,26 @@
   <li><a href="/photos">Photos</a></li>
   {{ end }}
 
+  {{ if .IsLoggedIn }}
   {{ if eq .Referer "/budget" }}
   <li><a href="/budget" class="active">Budget</a></li>
   {{ else}}
   <li><a href="/budget">Budget</a></li>
   {{ end }}
+  {{ end }}
 
-  <!-- TODO: Hide the logout button if the user is unauthenticated -->
   <li style="float:right">
-    <a href="/logout" class="logout">Logout</a>
+    {{ if .IsLoggedIn }}
+    <a href="/logout">Logout</a>
+    {{ else }}
+
+    {{ if eq .Referer "/login"}}
+    <a href="/login" class="active">Login</a>
+    {{ else }}
+    <a href="/login">Login</a>
+    {{ end }}
+
+    {{ end }}
   </li>
+
 </ul>

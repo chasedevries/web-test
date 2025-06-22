@@ -29,16 +29,15 @@ func budget(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, nil)
 }
 
+func login(w http.ResponseWriter, r *http.Request) {
+	var tpl = template.Must(template.ParseFiles("views/login.html"))
+	tpl.Execute(w, nil)
+}
+
 func generate(w http.ResponseWriter, r *http.Request) {
 	p := jokeFactory.GetRandomJoke()
 	tpl, _ := template.ParseFiles("components/joke.html")
 	tpl.Execute(w, p)
-}
-
-func navBar(w http.ResponseWriter, r *http.Request) {
-	n := requestHandler.GetNavbarForRequest(r)
-	var tpl = template.Must(template.ParseFiles("components/navbar.html"))
-	tpl.Execute(w, n)
 }
 
 func faviconHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,17 +53,14 @@ func HandleRequests(router *http.ServeMux, port string) {
 	router.HandleFunc("/photos", photos)
 	router.HandleFunc("/jokes", jokes)
 	router.HandleFunc("/budget", budget)
+	router.HandleFunc("/login", login)
 
 	router.HandleFunc("/generate", generate)
-	router.HandleFunc("/navbar", navBar)
+	router.HandleFunc("/navbar", requestHandler.Navbar)
 	router.HandleFunc("/budgetData", requestHandler.BudgetData)
+	router.HandleFunc("/loginForm", requestHandler.LoginForm)
 	router.HandleFunc("/auth", requestHandler.Auth)
 	router.HandleFunc("/logout", requestHandler.Logout)
-	// router.HandleFunc("/jokes", jokes)
-	// router.HandleFunc("/contact", contact)
-	// router.HandleFunc("/about", about)
-	// router.HandleFunc("/comment", comment)
-	// router.HandleFunc("/sam", sam)
 
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	router.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))

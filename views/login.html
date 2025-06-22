@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body class="content-frame">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chase</title>
+    <link rel="stylesheet" href="./styles/styles.css">
+    <script src="https://unpkg.com/htmx.org@1.9.6"
+      integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+      crossorigin="anonymous"></script>
+  </head>
+  <link rel="apple-touch-icon" href="/favicon.ico">
+  <div hx-trigger="load" hx-get="/navbar" class="menu-bar"></div>
+  <div>
+    <h1 class="heading">Welcome to Chase's Budget</h1>
+    <div hx-trigger="load" hx-get="/loginForm"></div>
+  </div>
+</body>
+
+</html>

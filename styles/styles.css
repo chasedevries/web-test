@@ -48,6 +48,33 @@ section p {
   max-width: 80%;
 }
 
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  max-width: 300px;
+}
+
+.inputGroup label {
+  margin-bottom: 5px;
+  color: var(--tan);
+  font-family: monospace;
+}
+
+.inputGroup input,
+.inputGroup textarea {
+  padding: 10px;
+  border: 1px solid var(--shadow);
+  border-radius: var(--md);
+  background-color: var(--night);
+  color: var(--tan);
+  font-family: monospace;
+}
+
+.inputGroup input::placeholder {
+  color: var(--blue);
+}
+
 ul {
   list-style-type: none;
   margin: 0;
