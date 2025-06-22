@@ -15,6 +15,10 @@ type Navbar struct {
 	Referer string `json:"referer"`
 }
 
+type Error struct {
+	ErrorMessage string `json:"error_message"`
+}
+
 type Transaction struct {
 	Id                int    `json:"id"`
 	CreatedAt         string `json:"created_at"`
@@ -58,16 +62,21 @@ func GetNavbarForRequest(r *http.Request) Navbar {
 // This function renders the budget if auth is found, otherwise it renders the login page.
 func BudgetData(w http.ResponseWriter, r *http.Request) {
 	cookie, err := getCookieFromRequest(r, "SESSION")
+
 	if err != nil {
 		log.Println("No SESSION cookie found:", err)
-	} else {
-		log.Println("Found SESSION cookie:", cookie.Value)
-		var tpl = template.Must(template.ParseFiles("components/budget.html"))
+		tpl := template.Must(template.ParseFiles("components/login.html"))
 		tpl.Execute(w, nil)
+		// tpl.Execute(w, Error{ErrorMessage: "Something went wrong. Please try again."})
 		return
 	}
 
-	var tpl = template.Must(template.ParseFiles("components/login.html"))
+	client := getSupabaseClient()
+	client.UpdateAuthSession(types.Session{AccessToken: cookie.Value})
+	data, _, err := client.From("transactions").Select("*", "exact", false).Execute()
+	log.Println("Transaction Data:", string(data))
+
+	tpl := template.Must(template.ParseFiles("components/budget.html"))
 	tpl.Execute(w, nil)
 }
 
