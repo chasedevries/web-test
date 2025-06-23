@@ -1,10 +1,12 @@
 package requestHandler
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -92,7 +94,6 @@ func BudgetData(w http.ResponseWriter, r *http.Request) {
 	client := getSupabaseClient()
 	client.UpdateAuthSession(types.Session{AccessToken: cookie.Value})
 	data, _, err := client.From("transactions").Select("*", "exact", false).Execute()
-	log.Println("Transaction Data:", string(data))
 	transactions := TransactionResponse{}
 	err = json.Unmarshal(data, &transactions)
 	if err != nil {
@@ -130,7 +131,6 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		}
 		http.SetCookie(w, &cookie)
 		r.AddCookie(&cookie)
-		log.Println("Session cookie set:", cookie)
 	}
 
 	http.Redirect(w, r, "/budget", http.StatusSeeOther)
@@ -161,51 +161,207 @@ func CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	amountString := r.FormValue("transactionAmount")
 	dateString := r.FormValue("transactionDate")
 
-	log.Println("form values:", r.Form)
-	log.Println("Received transaction amount:", amountString)
-	log.Println("Received transaction date:", dateString)
-
-	transactionAmount, err := strconv.Atoi(amountString)
-	transaction := TransactionCreateType{
-		TransactionDate:   dateString,
-		TransactionAmount: transactionAmount,
+	transactionAmount, err := strconv.ParseFloat(amountString, 64)
+	if err != nil {
+		log.Println("Error parsing transaction amount:", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
 	}
 
-	response, _, err := client.From("transactions").Insert(transaction, false, "", "", "").Execute()
+	transaction := TransactionCreateType{
+		TransactionDate:   dateString,
+		TransactionAmount: int(transactionAmount * 100), // Convert to cents
+	}
+
+	_, _, err = client.From("transactions").Insert(transaction, false, "", "", "").Execute()
 	if err != nil {
 		log.Println("Error inserting transaction:", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("Transaction created successfully:", response)
 	http.Redirect(w, r, "/budget", http.StatusSeeOther)
 }
 
-func TransactionQuery(w http.ResponseWriter, r *http.Request) {
-	sessionCookie, err := getCookieFromRequest(r, "SESSION")
+func getTransactionFromRecord(record []string, headerToIndex map[string]int, isDebit bool) (TransactionCreateType, error) {
+	if isDebit {
+		index := headerToIndex["Amount"]
+		transactionType := record[headerToIndex["Type"]]
 
-	session := types.Session{
-		AccessToken: sessionCookie.Value,
+		stringAmount := record[index]
+		amount, _ := strconv.ParseFloat(stringAmount, 64)
+		log.Println("String Amount", stringAmount)
+		log.Println("index", index)
+		log.Println("record:", record)
+
+		if transactionType == "CREDIT" {
+			amount = -amount // Convert credit to negative amount
+		}
+
+		return TransactionCreateType{
+			TransactionDate:   record[headerToIndex["Date"]],
+			TransactionAmount: int(amount * 100),
+		}, nil
+	} else {
+		creditAmountIndex := headerToIndex["Credit"]
+		creditAmount := record[creditAmountIndex]
+		debitAmountIndex := headerToIndex["Debit"]
+		debitAmount := record[debitAmountIndex]
+		// amount := record[amountIndex]
+		if creditAmount == "" && debitAmount == "" {
+			return TransactionCreateType{}, nil // No transaction to create
+		}
+
+		log.Println("credit/debit Amount", creditAmount, debitAmount)
+		log.Println("credit/debit Index", creditAmountIndex, debitAmountIndex)
+		log.Println("headerToIndex:", headerToIndex)
+		log.Println("record:", record)
+		if creditAmount != "" {
+			amount, err := strconv.ParseFloat(record[creditAmountIndex], 64)
+			if err != nil {
+				log.Println("Error converting credit amount:", err)
+				return TransactionCreateType{}, err
+			}
+
+			return TransactionCreateType{
+				TransactionDate:   record[headerToIndex["Transaction Date"]],
+				TransactionAmount: int(-amount * 100), // Credit amount is negative
+			}, nil
+
+		} else {
+			amount, err := strconv.ParseFloat(record[debitAmountIndex], 64)
+			if err != nil {
+				log.Println("Error converting debit amount:", err)
+				return TransactionCreateType{}, err
+			}
+			// Debit amount is positive
+			return TransactionCreateType{
+				TransactionDate:   record[headerToIndex["Transaction Date"]],
+				TransactionAmount: int(amount * 100),
+			}, nil
+		}
+	}
+}
+
+func BulkUpload(w http.ResponseWriter, r *http.Request) {
+	sessionCookie, err := getCookieFromRequest(r, "SESSION")
+	if err != nil {
+		log.Println("No SESSION cookie found:", err)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
 	}
 
 	client := getSupabaseClient()
-	client.UpdateAuthSession(session)
+	client.UpdateAuthSession(types.Session{AccessToken: sessionCookie.Value})
 
+	err = r.ParseMultipartForm(10 << 20)
 	if err != nil {
-		log.Println("Error creating Supabase client:", err)
-	} else {
-		data, count, err := client.From("transactions").Select("*", "exact", false).Execute()
-		if err != nil {
-			log.Println("Error fetching data:", err)
-		}
-
-		var d TransactionResponse
-		err = json.Unmarshal(data, &d)
-		log.Println("Data:", data)
-		log.Println("d:", d)
-		log.Println("d[0]:", d[0])
-		log.Println("d[0].TransactionAmount:", d[0].TransactionAmount)
-		log.Println("Count:", count)
+		log.Println("Error parsing multipart form:", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
 	}
+
+	file, _, err := r.FormFile("file")
+	log.Println("Received file from form:", file)
+	if err != nil {
+		log.Println("Error retrieving file from form:", err)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	// var transactions []TransactionCreateType
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
+	if err != nil {
+		log.Println("Error reading CSV file:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	debitHeaders := []string{"Date", "Amount", "Type", "Description"}
+	creditHeaders := []string{"Transaction Date", "Description", "Debit", "Credit"}
+
+	headers := records[0]
+	debitHeaderToRecordIndex := make(map[string]int)
+	creditHeaderToRecordIndex := make(map[string]int)
+	headerToRecordIndex := make(map[string]int)
+	isDebit := true
+	isCredit := true
+
+	// for i, header := range headers {
+	// 	if !slices.Contains(debitHeaders, header) {
+	// 		isDebit = false
+	// 	} else {
+	// 		debitHeaderToRecordIndex[header] = i
+	// 	}
+	// 	if !slices.Contains(creditHeaders, header) {
+	// 		isCredit = false
+	// 	} else {
+	// 		creditHeaderToRecordIndex[header] = i
+	// 	}
+	// }
+
+	for _, header := range debitHeaders {
+		index := slices.Index(headers, header)
+		if index == -1 {
+			isDebit = false
+		} else {
+			debitHeaderToRecordIndex[header] = index
+		}
+	}
+
+	for _, header := range creditHeaders {
+		index := slices.Index(headers, header)
+		if index == -1 {
+			isCredit = false
+		} else {
+			creditHeaderToRecordIndex[header] = index
+		}
+	}
+
+	if isDebit {
+		headerToRecordIndex = debitHeaderToRecordIndex
+	} else if isCredit {
+		headerToRecordIndex = creditHeaderToRecordIndex
+	} else {
+		log.Println("CSV file does not match expected headers for debit or credit transactions.")
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	log.Println("Is Debit:", isDebit)
+
+	transactions := []TransactionCreateType{}
+	for i, record := range records {
+		if i == 0 {
+			log.Println("header row:", record)
+		} else {
+			transaction, err := getTransactionFromRecord(record, headerToRecordIndex, isDebit)
+
+			if err != nil {
+				log.Println("Error getting transaction from record:", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			} else {
+				if transaction.TransactionAmount != 0 {
+					transactions = append(transactions, transaction)
+					log.Println("Transaction created:", transaction)
+				} else {
+					log.Println("No transaction created for record:", record)
+				}
+			}
+		}
+	}
+
+	// client.From("transactions").BulkUpload(transactions, false, "", "", "").Execute()
+	_, _, err = client.From("transactions").Insert(transactions, false, "", "", "").Execute()
+	if err != nil {
+		log.Println("Error inserting transactions:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// log.Println("Bulk upload successful:", response)
+	http.Redirect(w, r, "/budget", http.StatusSeeOther)
 }

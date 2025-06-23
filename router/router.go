@@ -62,6 +62,7 @@ func HandleRequests(router *http.ServeMux, port string) {
 	router.HandleFunc("/auth", requestHandler.Auth)
 	router.HandleFunc("/logout", requestHandler.Logout)
 	router.HandleFunc("/create-transaction", requestHandler.CreateTransaction)
+	router.HandleFunc("/bulk-upload", requestHandler.BulkUpload)
 
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	router.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))

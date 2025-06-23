@@ -19,20 +19,48 @@
     <h1 class="heading">Welcome to Chase's Budget</h1>
     <div hx-trigger="load" hx-get="/budgetData"></div>
   </div>
-  <h3>Create a New Transaction</h3>
-  <div class="floating-box">
-    <form hx-put="/create-transaction" hx-target="body" hx-swap="innerHTML">
-      <div class="inputGroup">
-        <label for="transactionAmount">Transaction Amount:</label>
-        <input type="number" name="transactionAmount" placeholder="Enter transaction amount" required>
+  <ul>
+    <li>
+      <h3 style="margin-left: 10px;">Create a Transaction</h3>
+      <div class="floating-box">
+        <form hx-put="/create-transaction" hx-target="body" hx-swap="innerHTML">
+          <div class="inputGroup">
+            <label for="transactionAmount">Transaction Amount</label>
+            <input type="number" name="transactionAmount" placeholder="Enter transaction amount" required>
+          </div>
+          <div class="inputGroup">
+            <label for="transactionDate">Transaction Date</label>
+            <input type="date" name="transactionDate" required>
+          </div>
+          <button class="floating-button" type="submit">Add Transaction</button>
+        </form>
       </div>
-      <div class="inputGroup">
-        <label for="transactionDate">Transaction Date:</label>
-        <input type="date" name="transactionDate" required>
+    </li>
+    <li>
+      <h3 style="margin-left: 10px;">Bulk Upload</h3>
+      <div class="floating-box">
+        <!-- <form hx-put="/bulk-upload" hx-target="body" hx-swap="innerHTML">
+          <div class="inputGroup">
+            <label for="exportCsv">Transaction Amount:</label>
+            <input type="file" name="exportCsv" placeholder="Upload a CSV" required>
+          </div>
+          <button class="floating-button" type="submit">Bulk Upload</button>
+        </form> -->
+
+        <form id='form' hx-encoding='multipart/form-data' hx-post='/bulk-upload'>
+          <label for="file">Upload a CSV</label>
+          <input type="file" name="file" placeholder="Upload a CSV">
+          <progress id='progress' value='0' max='100'></progress>
+          <button class="floating-button" type="submit">Bulk Upload</button>
+        </form>
+        <script>
+          htmx.on('#form', 'htmx:xhr:progress', function (evt) {
+            htmx.find('#progress').setAttribute('value', evt.detail.loaded / evt.detail.total * 100)
+          });
+        </script>
       </div>
-      <button class="floating-button" type="submit">Add Transaction</button>
-    </form>
-  </div>
+    </li>
+  </ul>
 </body>
 
 </html>
