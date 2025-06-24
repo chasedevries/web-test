@@ -4,6 +4,7 @@ import (
 	"html/template" // injection safe html generation
 	jokeFactory "htmx-demo/jokes"
 	requestHandler "htmx-demo/requests"
+	supabaseHandler "htmx-demo/supabase"
 	"log"
 	"net/http"
 )
@@ -61,8 +62,8 @@ func HandleRequests(router *http.ServeMux, port string) {
 	router.HandleFunc("/loginForm", requestHandler.LoginForm)
 	router.HandleFunc("/auth", requestHandler.Auth)
 	router.HandleFunc("/logout", requestHandler.Logout)
-	router.HandleFunc("/create-transaction", requestHandler.CreateTransaction)
-	router.HandleFunc("/bulk-upload", requestHandler.BulkUpload)
+	router.HandleFunc("/create-transaction", supabaseHandler.CreateTransaction)
+	router.HandleFunc("/bulk-upload", supabaseHandler.BulkUpload)
 
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	router.Handle("/styles/", http.StripPrefix("/styles/", http.FileServer(http.Dir("styles"))))
